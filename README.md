@@ -21,11 +21,97 @@ This project aims to demonstrate the ability to use an external dataset in our w
 ### Overview
 *TODO*: Explain about the data you are using and where you got it from.
 
+For this project, the data used is **Mobile Price Classification** ([data source](https://www.kaggle.com/iabhishekofficial/mobile-price-classification?select=train.csv))
+from Kaggle website. The description provided in Kaggle is the following one:
+
+```
+Bob has started his own mobile company. He wants to give tough fight to big companies like Apple,Samsung etc.
+
+He does not know how to estimate price of mobiles his company creates. In this competitive mobile phone market you cannot simply assume things. To solve this problem he collects sales data of mobile phones of various companies.
+
+Bob wants to find out some relation between features of a mobile phone(eg:- RAM,Internal Memory etc) and its selling price. But he is not so good at Machine Learning. So he needs your help to solve this problem.
+
+In this problem you do not have to predict actual price but a price range indicating how high the price is.
+```
+
+We are using the *train.csv* file.
+
 ### Task
 *TODO*: Explain the task you are going to be solving with this dataset and the features you will be using for it.
 
+As described above, we are using some technical characteristics of mobile phones
+to classify their prices between 0 and 3. So that, we have a Multi-Label
+Classification Problem.
+
+The features available are the following:
+
+* **battery_power**: Total energy a battery can store in one time measured in mAh.
+
+* **blue**: Has bluetooth or not.
+
+* **clock_speed**: speed at which microprocessor executes instructions.
+
+* **dual_sim**: Has dual sim support or not.
+
+* **fc**: Front Camera mega pixels
+
+* **four_g**: Has 4G or not.
+
+* **int_memory**: Internal Memory in Gigabytes.
+
+* **m_dep**: Mobile Depth in cm.
+
+* **mobile_wt**: Weight of mobile phone.
+
+* **n_cores**: Number of cores of processor.
+
+* **pc**: Primary Camera mega pixels.
+
+* **px_height**: Pixel Resolution Height.
+
+* **px_width**: Pixel Resolution Width.
+
+* **ram**: Random Access Memory in Mega Bytes.
+
+* **sc_h**: Screen Height of mobile in cm.
+
+* **sc_w**: Screen Width of mobile in cm.
+
+* **talk_time**: longest time that a single battery charge will last when you are.
+
+* **three_g**: Has 3G or not.
+
+* **touch_screen**: Has touch screen or not.
+
+* **wifi**: Has wifi or not.
+
+* **price_range**: This is the target variable with value of 0 (low cost), 1 (medium cost), 2 (high cost) and 3 (very high cost).
+
+<figure style='text-align:center'>
+    <img src='img/Target.png' alt='data' style="width:100%"/>
+    <figcaption>Figure 2: Target Feature</figcaption>
+</figure>
+
+In Figure 2 we can observe the Data Profile of our dataset. In this case we have a balanced target for training set, i.e., each class has almost the same representation. This is important because it makes it easier to create a general model using classical
+metrics such as Accuracy or ROC-AUC.
+
 ### Access
-*TODO*: Explain how you are accessing the data in your workspace.
+To access data in our Workspace, we upload it from *train.csv* local file. We 
+set the upload parameters (Tabular Data, separated by commas, with header, etc.).
+
+This way, if we go to *Datasets* tab in ML Studio, we can see our Dataset and
+watch a Profile as the one shown in Figure 2 and even get a Python SDK chunk to 
+consume this dataset.
+
+<figure style='text-align:center'>
+    <img src='img/Dataset-upload.png' alt='data' style="width:100%"/>
+    <figcaption>Figure 3: Datasets Section After Uploading Data</figcaption>
+</figure>
+
+<figure style='text-align:center'>
+    <img src='img/Dataset-detail.png' alt='data' style="width:70%"/>
+    <figcaption>Figure 4: Details and Available Options for Uploaded Dataset.</figcaption>
+</figure>
 
 ## Automated ML
 *TODO*: Give an overview of the `automl` settings and configuration you used for this experiment
