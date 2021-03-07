@@ -10,7 +10,7 @@ This project aims to demonstrate the ability to use an external dataset in our w
 
 <figure style='text-align:center'>
     <img src='img/capstone-diagram.png' alt='diagram' style="width:50%"/>
-    <figcaption>Figure 1: Project Workflow</figcaption>
+    <figcaption style='text-align:center'>Figure 1: Project Workflow</figcaption>
 </figure>
 
 ## Project Set Up and Installation
@@ -89,7 +89,7 @@ The features available are the following:
 
 <figure style='text-align:center'>
     <img src='img/Target.png' alt='data' style="width:100%"/>
-    <figcaption>Figure 2: Target Feature</figcaption>
+    <figcaption style='text-align:center'>Figure 2: Target Feature</figcaption>
 </figure>
 
 In Figure 2 we can observe the Data Profile of our dataset. In this case we have a balanced target for training set, i.e., each class has almost the same representation. This is important because it makes it easier to create a general model using classical
@@ -105,16 +105,30 @@ consume this dataset.
 
 <figure style='text-align:center'>
     <img src='img/Dataset-upload.png' alt='data' style="width:100%"/>
-    <figcaption>Figure 3: Datasets Section After Uploading Data</figcaption>
+    <figcaption style='text-align:center'>Figure 3: Datasets Section After Uploading Data</figcaption>
 </figure>
 
 <figure style='text-align:center'>
-    <img src='img/Dataset-detail.png' alt='data' style="width:70%"/>
-    <figcaption>Figure 4: Details and Available Options for Uploaded Dataset.</figcaption>
+    <img src='img/Dataset-detail.png' alt='datadetail' style="width:70%"/>
+    <figcaption style='text-align:center'>Figure 4: Details and Available Options for Uploaded Dataset.</figcaption>
 </figure>
 
 ## Automated ML
-*TODO*: Give an overview of the `automl` settings and configuration you used for this experiment
+The first model obtained is the one using AutoML. To do it, we use the automl.ipynb
+file. In this notebook, we use the Python SDK to load the registered dataset and
+configure an AutoML run. After that, the best model obtained is saved and if the 
+results in terms of Accuracy are better than those obtained using Hyperparameter
+Tuning, then the model is deployed and consumed as an API.
+
+As part of the AutoML Configuration, it is used a Compute Target STANDARD_D2_V2 
+with 4 `max_nodes`. This Compute Target is called `automl-mobiles`.
+
+<figure style='text-align:center'>
+    <img src='img/ComputeCluster.png' alt='compute' style="width:70%"/>
+    <figcaption style='text-align:center'>Figure 6: Azure Compute Cluster for AutoML Run.</figcaption>
+</figure>
+
+
 
 ### Results
 *TODO*: What are the results you got with your automated ML model? What were the parameters of the model? How could you have improved it?
