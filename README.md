@@ -77,7 +77,7 @@ The features available are the following:
 
 * **sc_w**: Screen Width of mobile in cm.
 
-* **talk_time**: longest time that a single battery charge will last when you are.
+* **talk_time**: longest time that a single battery charge will last when you are talking.
 
 * **three_g**: Has 3G or not.
 
@@ -277,7 +277,7 @@ properties let us know that, only with this feature, we could obtain a good mode
 
 HOW COULD BE THIS MODEL IMPROVED?
 
-Eventhugh accuracy is good, there are different things that can be done to 
+Eventhough accuracy is good, there are different things that can be done to 
 improve the model in future developments. 
 
 First of all, the easiest way could be increasing the experiment timeout and the
@@ -301,9 +301,69 @@ Finally, to ensure as much as possible our model is robust, we could add Stratif
 ## Hyperparameter Tuning
 *TODO*: What kind of model did you choose for this experiment and why? Give an overview of the types of parameters and their ranges used for the hyperparameter search
 
+For this experiment, we've chosen [LighGBM](https://lightgbm.readthedocs.io/en/latest/), an Open Source library developed by MicroSoft with python API. Inside this library, we choose LGBMClassifier, a Gradient Boosting based algorithm for classification.
+
+This library, is well known because their algorithms are computationally fast
+and lead to good results in terms of accuracy. Indeed, it is one of the most used ML algorithm in Kaggle platform.
+
+In its Docs we have the following description:
+
+LightGBM is a gradient boosting framework that uses tree based learning algorithms. It is designed to be distributed and efficient with the following advantages:
+
+* Faster training speed and higher efficiency.
+
+* Lower memory usage.
+
+* Better accuracy.
+
+* Support of parallel, distributed, and GPU learning.
+
+* Capable of handling large-scale data.
+
+Personally, it is one of the algorithms I trust more and the one I feel more familiar with. This is the main reason why it is the chosen one.
+
+Some of its hyperparams are:
+
+* **num_leaves** (int, optional (default=31)) – Maximum tree leaves for base learners.
+
+* **max_depth** (int, optional (default=-1)) – Maximum tree depth for base learners, <=0 means no limit.
+
+* **learning_rate** (float, optional (default=0.1)) – Boosting learning rate. You can use callbacks parameter of fit method to shrink/adapt learning rate in training using reset_parameter callback. Note, that this will ignore the learning_rate argument in training.
+
+* **n_estimators** (int, optional (default=100)) – Number of boosted trees to fit.
+
+* **subsample_for_bin** (int, optional (default=200000)) – Number of samples for constructing bins.
+
+For computing we use a Compute Cluster identical to the one used for AutoML Run.
+The global configuration for HyperDrive Run is the following:
+
+<figure>
+    <img src='img/HyperDrive.png' alt='hyperd' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 13: Code chunk for HyperDrive in python SDK.</figcaption>
+</figure>
+
+To do the estimation we use the file train.py where a bit of feature engineering is done. We define 3 new variables: `Vol_Dens` which is mobile weight divided by screen volume, `px_dens` which is pixels density in mobile's screen and `talk_cons` which represents battery consumption due to calls.
+
+After that, train-test split is done with 80-20 ratio and LGBMClassifier is applied.
+
+As we can see in Figure 13, the sampling method used us Random Sampling and BanditPolicy as stopping criterion.For the estimator definition, we had to specify that we need to install `lightgbm` in *pip_packages* parameter.
+
+The metric we want to optimize is Accuracy and we allow 10 runs in batches of 4,
+as many as max_clusters we've set up for our Compute Cluster instance.
 
 ### Results
 *TODO*: What are the results you got with your model? What were the parameters of the model? How could you have improved it?
+
+The model could have been improved with:
+* Better Optimization:
+  * More iterations in optimization process for Random Search
+  * Using a more exhaustive heuristic such as Bayesian Optimization
+  * Optimizing more hyperparameters
+* Better Feature engineering:
+  * Feature selection based on Feature Importance obtained from AutoML
+  * Doing some Dimensionality Reduction to infer new variables.
+  * Use target encoding with `number of cores` for example.
+* Trying other algorithms
 
 *TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
 
