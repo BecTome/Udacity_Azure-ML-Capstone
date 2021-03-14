@@ -21,7 +21,7 @@ ds = TabularDatasetFactory.from_delimited_files(path)
 #ds = Dataset.get_by_name(ws, name='mobile_prices')
 
 def clean_data(data):
-    x_df = data.to_pandas_dataframe().dropna(
+    x_df = data.to_pandas_dataframe().dropna()
     x_df['Vol_Dens'] = x_df['mobile_wt'] / (x_df['sc_w'] * x_df['sc_h'] * x_df['m_dep'])
     x_df['px_dens'] = x_df['px_height'] * x_df['px_width'] / (x_df['sc_w'] * x_df['sc_h'])
     x_df['talk_cons'] = x_df['battery_power'] / x_df['talk_time']
