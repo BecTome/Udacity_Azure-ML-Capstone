@@ -14,16 +14,19 @@ from azureml.data.dataset_factory import TabularDatasetFactory
 # TODO: Create TabularDataset using TabularDatasetFactory
 # Data is located at:
 # "https://automlsamplenotebookdata.blob.core.windows.net/automl-sample-notebook-data/bankmarketing_train.csv"
-# path = "https://automlsamplenotebookdata.blob.core.windows.net/automl-sample-notebook-data/bankmarketing_train.csv"
-# ds = TabularDatasetFactory.from_delimited_files(path)
-#ds = ds.to_pandas_dataframe()
-ws = Workspace.from_config()
-ds = Dataset.get_by_name(ws, name='mobile_prices')
+path = "https://raw.githubusercontent.com/BecTome/Udacity_Azure-ML-Capstone/aaf5e761a04a3ef09fe318260153bde6a3682fc9/data/train.csv"
+ds = TabularDatasetFactory.from_delimited_files(path)
+# ds = ds.to_pandas_dataframe()
+#ws = Workspace.from_config()
+#ds = Dataset.get_by_name(ws, name='mobile_prices')
 
 def clean_data(data):
-    data['Vol_Dens'] = data['weight'] / (data['sc_w'] * data['sc_h'] * data['depth'])
-    data['px_dens'] = data['px_height'] * data['x_width'] / (data['sc_w'] * data['sc_h'])
-    data['talk_cons'] = data['battery_power'] / data['talk_time']
+    x_df = data.to_pandas_dataframe().dropna(
+    x_df['Vol_Dens'] = x_df['mobile_wt'] / (x_df['sc_w'] * x_df['sc_h'] * x_df['m_dep'])
+    x_df['px_dens'] = x_df['px_height'] * x_df['px_width'] / (x_df['sc_w'] * x_df['sc_h'])
+    x_df['talk_cons'] = x_df['battery_power'] / x_df['talk_time']
+    y_df = x_df.pop("price_range")
+
     return x_df, y_df
 
 
