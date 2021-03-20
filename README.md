@@ -351,8 +351,25 @@ As we can see in Figure 13, the sampling method used us Random Sampling and Band
 The metric we want to optimize is Accuracy and we allow 10 runs in batches of 4,
 as many as max_clusters we've set up for our Compute Cluster instance.
 
+<figure>
+    <img src='img/HyperDriveDetails.png' alt='HyperDriveDetails' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 14: HyperDrive run details.</figcaption>
+</figure>
+
+<figure>
+    <img src='img/HyperDriveRun.png' alt='HyperDriveRun' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 15: HyperDrive runs.</figcaption>
+</figure>
+
 ### Results
-*TODO*: What are the results you got with your model? What were the parameters of the model? How could you have improved it?
+
+Finally, we obtain a 93% of accuracy which is a bit worst than the one from AutoML so that we are going to deploy the first one.
+
+<figure>
+    <img src='img/hyperdrive_best.png' alt='hyperdrive_best' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 16: Performance for our hyperdrive model.</figcaption>
+</figure>
+
 
 The model could have been improved with:
 * Better Optimization:
@@ -367,14 +384,61 @@ The model could have been improved with:
 
 *TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
 
+<figure>
+    <img src='img/HyperDriveBestModelDetails.png' alt='HyperDriveBestModelDetails' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 17: HyperDrive best model details.</figcaption>
+</figure>
+
+<figure>
+    <img src='img/RunDetails.png' alt='RunDetails' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 18: HyperDrive RunDetails widget.</figcaption>
+</figure>
+
+<figure>
+    <img src='img/RunDetails2.png' alt='RunDetails2' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 19: HyperDrive RunDetails widget.</figcaption>
+</figure>
+
 ## Model Deployment
-*TODO*: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
+Now that we know that the best performing model is the one obtained using AutoML, we can deploy it as a Web Service and consume it.
+
+Once the best AutoML model is obtained, we access to it and download scoring_file_v_1_0_0.py. As we have mapped the model results to a new folder called 'outputs/' in the registered model, we have to do a quick fix in the scoring file (change the path to model.pkl to outputs/model.pkl) and upload it to the VM to acess to it locally.
+
+<figure>
+    <img src='img/endpoint_deploy.png' alt='deploy_endpoint' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 20: Code chunk to publish AutoML to automl-mobile-sdk-2 endpoint.</figcaption>
+</figure>
+
+<figure>
+    <img src='img/endpoint_active.png' alt='endpoint_active' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 21: The endpoint is working and active.</figcaption>
+</figure>
+
+After that, we upload locally data/test.csv and get the 10 first rows to test the running endpoint is working and receive 10 predictions.
+
+<figure>
+    <img src='img/endpoint_test.png' alt='endpoint_test' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 22: Predictions given by the Web Service to test.</figcaption>
+</figure>
+
+Finally, we delete the computer target and the service because we are not using it anymore.
+
+<figure>
+    <img src='img/endpoint_delete.png' alt='endpoint_delete' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 23: Delete Computer Instances.</figcaption>
+</figure>
 
 ## Screen Recording
-*TODO* Provide a link to a screen recording of the project in action. Remember that the screencast should demonstrate:
-- A working model
-- Demo of the deployed  model
-- Demo of a sample request sent to the endpoint and its response
+
+Clicking on the following picture you can watch a **5 minutes video** with 
+explanations about the content of the project.
+
+[<img src="img/miniatura.png">](https://youtu.be/zVBky-MG9Bw)
 
 ## Standout Suggestions
-*TODO (Optional):* This is where you can provide information about any standout suggestions that you have attempted.
+
+For future improvements, we propose:
+
+* Convert the model to ONNX format.
+* Deploy the model to the Edge using Azure IoT Edge.
+* Enable logging with App Insights, do benchmarking and develop swagger documentation as we did for ML-Ops project.
