@@ -109,6 +109,14 @@ consume this dataset.
 </figure>
 
 ## Automated ML
+
+**IMPORTANT**
+
+To run the AutoML part, you have to upload these files:
+1. Upload automl.ipynb to Notebooks VM
+2. Upload dependencies folder
+3. Upload scoring_file_v_1_0_0_0.py
+
 Once we have some sensitivity about data, we are going to train a classifier 
 using an ML model. Modeling is an art but we have some interesting tools that 
 help us to obtain an acceptable ML model without doing much feature engineering.
@@ -220,7 +228,7 @@ obtained.
 
 In Figure 7 we can observe a list of models, sorted by Accuracy (our primary metric).
 In the first position, the best model is shown: it is a `Voting Ensemble` model
-which provides predictions with a 94.7% accuracy on cross validation. This is the
+which provides predictions with a 93.65% accuracy on cross validation. This is the
 model that we are going to compare with the one obtained using HyperDrive in order 
 to choose which one deploy. In Figure 8, Details about the mentioned model are 
 displayed.
@@ -246,7 +254,7 @@ relationship with Target feature.
 </figure>
 
 What can be concluded from Figure 9 and 10 is that this model works with impressing
-results. The 94% of accuracy can be checked as real because this happens for all
+results. The 93.65% of accuracy can be checked as real because this happens for all
 of the classes. This is a quite well informed dataset and, as it's well known, 
 good data can easily lead to good models.
 
@@ -379,13 +387,18 @@ as many as max_clusters we've set up for our Compute Cluster instance.
 
 ### Results
 
-Finally, we obtain a 93% of accuracy which is a bit worst than the one from AutoML so that we are going to deploy the first one.
+Finally, we obtain a 93.25% of accuracy which is a bit worst than the one from AutoML so that we are going to deploy the first one.
 
 <figure>
     <img src='img/hyperdrive_best.png' alt='hyperdrive_best' style="width:100%"/>
     <figcaption style="text-align:center">Figure 16: Performance for our hyperdrive model.</figcaption>
 </figure>
 
+The hyperparameters obtained are a learning rate of 0.14, which is related to the 
+velocity of the gradient-descent optimization. It is quite surprising that the 
+max_depth is very low (minimum of the range) which could lead to underfitting.
+However, this is compensed with a slow number of leaves which usually carries to 
+an overspecialization of the model,
 
 The model could have been improved with:
 * Better Optimization:
@@ -403,15 +416,20 @@ The model could have been improved with:
     <figcaption style="text-align:center">Figure 17: HyperDrive best model details.</figcaption>
 </figure>
 
-<figure>
-    <img src='img/RunDetails.png' alt='RunDetails' style="width:100%"/>
-    <figcaption style="text-align:center">Figure 18: HyperDrive RunDetails widget.</figcaption>
-</figure>
+
 
 <figure>
     <img src='img/RunDetails2.png' alt='RunDetails2' style="width:100%"/>
-    <figcaption style="text-align:center">Figure 19: HyperDrive RunDetails widget.</figcaption>
+    <figcaption style="text-align:center">Figure 18: HyperDrive RunDetails widget.</figcaption>
 </figure>
+
+Finally, the registered model is shown in the Figure below
+
+<figure>
+    <img src='img/HyperDriveRegistered.png' alt='HyperDriveRegistered' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 19: HyperDrive Registered model.</figcaption>
+</figure>
+
 
 ## Model Deployment
 Now that we know that the best performing model is the one obtained using AutoML, we can deploy it as a Web Service and consume it.
@@ -420,7 +438,7 @@ Once the best AutoML model is obtained, we access to it and download scoring_fil
 
 <figure>
     <img src='img/endpoint_deploy.png' alt='deploy_endpoint' style="width:100%"/>
-    <figcaption style="text-align:center">Figure 20: Code chunk to publish AutoML to automl-mobile-sdk-2 endpoint.</figcaption>
+    <figcaption style="text-align:center">Figure 20: Code chunk to publish AutoML to automl-mobile-sdk-4 endpoint.</figcaption>
 </figure>
 
 <figure>
@@ -442,6 +460,14 @@ Finally, we delete the computer target and the service because we are not using 
     <figcaption style="text-align:center">Figure 23: Delete Computer Instances.</figcaption>
 </figure>
 
+**QUERY ENDPOINT**
+
+If you want to query the endpoint, you can do it sending a post request to the 
+URI shown in the Figure 22 (or the new one obtained if a new endpoint is created with the same model)
+with the data structure shown in data.json file. Then, you are going to receive 
+a response like the one shown.
+
+
 ## Screen Recording
 
 Clicking on the following picture you can watch a **5 minutes video** with 
@@ -451,6 +477,7 @@ explanations about the content of the project.
 
 ## Standout Suggestions
 
+## Future Improvements
 For future improvements, we propose:
 
 * Convert the model to ONNX format.
