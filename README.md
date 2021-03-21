@@ -13,13 +13,9 @@ This project aims to demonstrate the ability to use an external dataset in our w
     <figcaption style='text-align:center'>Figure 1: Project Workflow</figcaption>
 </figure>
 
-## Project Set Up and Installation
-*OPTIONAL:* If your project has any special installation steps, this is where you should put it. To turn this project into a professional portfolio project, you are encouraged to explain how to set up this project in AzureML.
-
 ## Dataset
 
 ### Overview
-*TODO*: Explain about the data you are using and where you got it from.
 
 For this project, the data used is **Mobile Price Classification** ([data source](https://www.kaggle.com/iabhishekofficial/mobile-price-classification?select=train.csv))
 from Kaggle website. The description provided in Kaggle is the following one:
@@ -37,7 +33,6 @@ In this problem you do not have to predict actual price but a price range indica
 We are using the *train.csv* file.
 
 ### Task
-*TODO*: Explain the task you are going to be solving with this dataset and the features you will be using for it.
 
 As described above, we are using some technical characteristics of mobile phones
 to classify their prices between 0 and 3. So that, we have a Multi-Label
@@ -207,7 +202,6 @@ by the number of maximum nodes chosen for Compute Target. In our case, this valu
     This time, no specific featurization is proposed so that we keep it as 'auto'.
 
 ### Results
-*TODO*: What are the results you got with your automated ML model? What were the parameters of the model? How could you have improved it?
 
 As a summary, we have a *Classification* task with a training dataset with 2000
 rows. As this number is low, we decide to implement cross validation with 5 folds.
@@ -299,9 +293,8 @@ Finally, to ensure as much as possible our model is robust, we could add Stratif
 
 
 ## Hyperparameter Tuning
-*TODO*: What kind of model did you choose for this experiment and why? Give an overview of the types of parameters and their ranges used for the hyperparameter search
 
-For this experiment, we've chosen [LighGBM](https://lightgbm.readthedocs.io/en/latest/), an Open Source library developed by MicroSoft with python API. Inside this library, we choose LGBMClassifier, a Gradient Boosting based algorithm for classification.
+For this experiment, we've chosen [LightGBM](https://lightgbm.readthedocs.io/en/latest/), an Open Source library developed by MicroSoft with python API. Inside this library, we choose LGBMClassifier, a Gradient Boosting based algorithm for classification.
 
 This library, is well known because their algorithms are computationally fast
 and lead to good results in terms of accuracy. Indeed, it is one of the most used ML algorithm in Kaggle platform.
@@ -342,6 +335,28 @@ The global configuration for HyperDrive Run is the following:
     <figcaption style="text-align:center">Figure 13: Code chunk for HyperDrive in python SDK.</figcaption>
 </figure>
 
+**Steps**
+1. Select Parameter Sampler
+2. Define a Policy
+3. Create a estimator using `train.py`.
+4. Define a `HyperDriveConfig` that aims to maximise accuracy with less than 10 runs and 4 concurrent at most because we have 4 nodes in the cluster at most.
+5. Submit the job and review the results.
+6. Register the model with `.register_model()`. 
+
+* **Parameter sampler**: The parameter sampler I chose was `RandomParameterSampling` 
+because it accepts both discrete and continuous hyperparameters. For `lr`, a uniform 
+distribution choice was made in a range between 0.01 an 0.3 which is a quite common 
+range for this kind of tasks. For `max_depth` we choose an arbitrary value between 3 and 10.
+Typically, larger values of `max_depth`can incur in overfitting. In addition to this, `num_leaves`
+and `n_estimators`have been chosen similarly, trying to cover the range of typical values
+based on my real personal experience. For these 3 hyperparameters, a random discrete
+choice was used.
+
+* **Early Stopping Policy**: The Policy chosen is `Bandit Policy`. This one tries
+to avoid unnecessary runs by comparing the metric obtained during a set of runs 
+and, if it's much worst than the best one (given an `slack factor`), 
+then there`s no more runs.
+
 To do the estimation we use the file train.py where a bit of feature engineering is done. We define 3 new variables: `Vol_Dens` which is mobile weight divided by screen volume, `px_dens` which is pixels density in mobile's screen and `talk_cons` which represents battery consumption due to calls.
 
 After that, train-test split is done with 80-20 ratio and LGBMClassifier is applied.
@@ -360,6 +375,7 @@ as many as max_clusters we've set up for our Compute Cluster instance.
     <img src='img/HyperDriveRun.png' alt='HyperDriveRun' style="width:100%"/>
     <figcaption style="text-align:center">Figure 15: HyperDrive runs.</figcaption>
 </figure>
+
 
 ### Results
 
@@ -381,8 +397,6 @@ The model could have been improved with:
   * Doing some Dimensionality Reduction to infer new variables.
   * Use target encoding with `number of cores` for example.
 * Trying other algorithms
-
-*TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
 
 <figure>
     <img src='img/HyperDriveBestModelDetails.png' alt='HyperDriveBestModelDetails' style="width:100%"/>
