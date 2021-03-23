@@ -140,7 +140,7 @@ with 4 `max_nodes`. This Compute Target is called `automl-mobiles`.
 
 <figure style='text-align:center'>
     <img src='img/ComputeCluster.png' alt='compute' style="width:70%"/>
-    <figcaption style='text-align:center'>Figure 6: Azure Compute Cluster for AutoML Run.</figcaption>
+    <figcaption style='text-align:center'>Figure 5: Azure Compute Cluster for AutoML Run.</figcaption>
 </figure>
 
 Configuration:
@@ -169,7 +169,7 @@ automl_config = AutoMLConfig(compute_target=cpu_cluster,
 * **max_concurrent_iterations**: Represents the maximum number of iterations that would be executed in parallel. The default value is 1. This value is bounded
 by the number of maximum nodes chosen for Compute Target. In our case, this value is 4 so that we set the same number of max_concurrent_iterations.
 * **primary_metric**: The metric that Automated Machine Learning will optimize for model selection. Automated Machine Learning collects more metrics than it can optimize. In this case, as we have a balanced target for Multi Label Classification, 'accuracy' seems to be a good option.
-* **compute_target**: The Azure Machine Learning compute target to run the Automated Machine Learning experiment on (see Figure 6).
+* **compute_target**: The Azure Machine Learning compute target to run the Automated Machine Learning experiment on (see Figure 5).
 * **task**:The type of task to run. Values can be 'classification', 'regression', or 'forecasting' depending on the type of automated ML problem to solve. In this case, it's obviously 'classification'.
 * **training_data**: The training data to be used within the experiment. It should contain both training features and a label column (optionally a sample weights column). If training_data is specified, then the label_column_name parameter must also be specified.
 * **label_column_name**: The name of the label column. If the input data is from a pandas.DataFrame which doesn't have column names, column indices can be used instead, expressed as integers. In this case, the column in *training_data* that we want to predict is 'price_range'.
@@ -222,16 +222,351 @@ obtained.
 
 <figure>
     <img src='img/BestAutoMLRun.png' alt='bestrun' style="width:100%"/>
-    <figcaption style="text-align:center">Figure 7: Successful AutoML experiment run on 
+    <figcaption style="text-align:center">Figure 6: Successful AutoML experiment run on 
     cpu_cluster.</figcaption>
 </figure>
 
-In Figure 7 we can observe a list of models, sorted by Accuracy (our primary metric).
+In Figure 6 we can observe a list of models, sorted by Accuracy (our primary metric).
 In the first position, the best model is shown: it is a `Voting Ensemble` model
 which provides predictions with a 93.65% accuracy on cross validation. This is the
 model that we are going to compare with the one obtained using HyperDrive in order 
 to choose which one deploy. In Figure 8, Details about the mentioned model are 
 displayed.
+
+This `VotingEnsemble` is obtained by combining the results of different models. 
+In this case, it is the mix of 9 differently tuned `XGBoostClassifier` and a `RandomForestClassifier` all of them previously preprocessed with a `sparsenormalizer` transformer. In the following output, just below *prefittedsoftvotingclassifier*, whe have estimators associated to numbers and the weights associated to each of the predictions in the ensemble. We can see that '0', '1', '25', '26' and '4' have the majority of the weights, with an accumulate of the 67%. Let's check out the output after printing the estimator:
+```
+datatransformer
+{'enable_dnn': None,
+ 'enable_feature_sweeping': None,
+ 'feature_sweeping_config': None,
+ 'feature_sweeping_timeout': None,
+ 'featurization_config': None,
+ 'force_text_dnn': None,
+ 'is_cross_validation': None,
+ 'is_onnx_compatible': None,
+ 'logger': None,
+ 'observer': None,
+ 'task': None,
+ 'working_dir': None}
+
+prefittedsoftvotingclassifier
+{'estimators': ['6', '16', '23', '0', '30', '20', '1', '25', '26', '4'],
+ 'weights': [0.06666666666666667,
+             0.06666666666666667,
+             0.06666666666666667,
+             0.13333333333333333,
+             0.06666666666666667,
+             0.06666666666666667,
+             0.13333333333333333,
+             0.13333333333333333,
+             0.13333333333333333,
+             0.13333333333333333]}
+
+6 - sparsenormalizer
+{'copy': True, 'norm': 'l2'}
+
+6 - xgboostclassifier
+{'base_score': 0.5,
+ 'booster': 'gbtree',
+ 'colsample_bylevel': 1,
+ 'colsample_bynode': 1,
+ 'colsample_bytree': 0.5,
+ 'eta': 0.1,
+ 'gamma': 0,
+ 'learning_rate': 0.1,
+ 'max_delta_step': 0,
+ 'max_depth': 6,
+ 'max_leaves': 15,
+ 'min_child_weight': 1,
+ 'missing': nan,
+ 'n_estimators': 100,
+ 'n_jobs': 1,
+ 'nthread': None,
+ 'objective': 'multi:softprob',
+ 'random_state': 0,
+ 'reg_alpha': 0,
+ 'reg_lambda': 2.0833333333333335,
+ 'scale_pos_weight': 1,
+ 'seed': None,
+ 'silent': None,
+ 'subsample': 1,
+ 'tree_method': 'auto',
+ 'verbose': -10,
+ 'verbosity': 0}
+
+16 - sparsenormalizer
+{'copy': True, 'norm': 'l2'}
+
+16 - xgboostclassifier
+{'base_score': 0.5,
+ 'booster': 'gbtree',
+ 'colsample_bylevel': 1,
+ 'colsample_bynode': 1,
+ 'colsample_bytree': 0.8,
+ 'eta': 0.3,
+ 'gamma': 0.01,
+ 'learning_rate': 0.1,
+ 'max_delta_step': 0,
+ 'max_depth': 9,
+ 'max_leaves': 255,
+ 'min_child_weight': 1,
+ 'missing': nan,
+ 'n_estimators': 50,
+ 'n_jobs': 1,
+ 'nthread': None,
+ 'objective': 'multi:softprob',
+ 'random_state': 0,
+ 'reg_alpha': 0,
+ 'reg_lambda': 1.1458333333333335,
+ 'scale_pos_weight': 1,
+ 'seed': None,
+ 'silent': None,
+ 'subsample': 0.5,
+ 'tree_method': 'auto',
+ 'verbose': -10,
+ 'verbosity': 0}
+
+23 - sparsenormalizer
+{'copy': True, 'norm': 'l2'}
+
+23 - xgboostclassifier
+{'base_score': 0.5,
+ 'booster': 'gbtree',
+ 'colsample_bylevel': 1,
+ 'colsample_bynode': 1,
+ 'colsample_bytree': 1,
+ 'eta': 0.3,
+ 'gamma': 0,
+ 'learning_rate': 0.1,
+ 'max_delta_step': 0,
+ 'max_depth': 10,
+ 'max_leaves': 0,
+ 'min_child_weight': 1,
+ 'missing': nan,
+ 'n_estimators': 25,
+ 'n_jobs': 1,
+ 'nthread': None,
+ 'objective': 'multi:softprob',
+ 'random_state': 0,
+ 'reg_alpha': 0,
+ 'reg_lambda': 0.625,
+ 'scale_pos_weight': 1,
+ 'seed': None,
+ 'silent': None,
+ 'subsample': 0.7,
+ 'tree_method': 'auto',
+ 'verbose': -10,
+ 'verbosity': 0}
+
+0 - maxabsscaler
+{'copy': True}
+
+0 - lightgbmclassifier
+{'boosting_type': 'gbdt',
+ 'class_weight': None,
+ 'colsample_bytree': 1.0,
+ 'importance_type': 'split',
+ 'learning_rate': 0.1,
+ 'max_depth': -1,
+ 'min_child_samples': 20,
+ 'min_child_weight': 0.001,
+ 'min_split_gain': 0.0,
+ 'n_estimators': 100,
+ 'n_jobs': 1,
+ 'num_leaves': 31,
+ 'objective': None,
+ 'random_state': None,
+ 'reg_alpha': 0.0,
+ 'reg_lambda': 0.0,
+ 'silent': True,
+ 'subsample': 1.0,
+ 'subsample_for_bin': 200000,
+ 'subsample_freq': 0,
+ 'verbose': -10}
+
+30 - sparsenormalizer
+{'copy': True, 'norm': 'l2'}
+
+30 - xgboostclassifier
+{'base_score': 0.5,
+ 'booster': 'gbtree',
+ 'colsample_bylevel': 1,
+ 'colsample_bynode': 1,
+ 'colsample_bytree': 0.9,
+ 'eta': 0.3,
+ 'gamma': 0,
+ 'learning_rate': 0.1,
+ 'max_delta_step': 0,
+ 'max_depth': 9,
+ 'max_leaves': 0,
+ 'min_child_weight': 1,
+ 'missing': nan,
+ 'n_estimators': 25,
+ 'n_jobs': 1,
+ 'nthread': None,
+ 'objective': 'multi:softprob',
+ 'random_state': 0,
+ 'reg_alpha': 0,
+ 'reg_lambda': 0.7291666666666667,
+ 'scale_pos_weight': 1,
+ 'seed': None,
+ 'silent': None,
+ 'subsample': 0.9,
+ 'tree_method': 'auto',
+ 'verbose': -10,
+ 'verbosity': 0}
+
+20 - maxabsscaler
+{'copy': True}
+
+20 - lightgbmclassifier
+{'boosting_type': 'gbdt',
+ 'class_weight': None,
+ 'colsample_bytree': 0.4955555555555555,
+ 'importance_type': 'split',
+ 'learning_rate': 0.06842421052631578,
+ 'max_bin': 20,
+ 'max_depth': -1,
+ 'min_child_samples': 138,
+ 'min_child_weight': 7,
+ 'min_split_gain': 0.21052631578947367,
+ 'n_estimators': 400,
+ 'n_jobs': 1,
+ 'num_leaves': 197,
+ 'objective': None,
+ 'random_state': None,
+ 'reg_alpha': 0.894736842105263,
+ 'reg_lambda': 0.21052631578947367,
+ 'silent': True,
+ 'subsample': 0.9405263157894738,
+ 'subsample_for_bin': 200000,
+ 'subsample_freq': 0,
+ 'verbose': -10}
+
+1 - maxabsscaler
+{'copy': True}
+
+1 - xgboostclassifier
+{'base_score': 0.5,
+ 'booster': 'gbtree',
+ 'colsample_bylevel': 1,
+ 'colsample_bynode': 1,
+ 'colsample_bytree': 1,
+ 'gamma': 0,
+ 'learning_rate': 0.1,
+ 'max_delta_step': 0,
+ 'max_depth': 3,
+ 'min_child_weight': 1,
+ 'missing': nan,
+ 'n_estimators': 100,
+ 'n_jobs': 1,
+ 'nthread': None,
+ 'objective': 'multi:softprob',
+ 'random_state': 0,
+ 'reg_alpha': 0,
+ 'reg_lambda': 1,
+ 'scale_pos_weight': 1,
+ 'seed': None,
+ 'silent': None,
+ 'subsample': 1,
+ 'tree_method': 'auto',
+ 'verbose': -10,
+ 'verbosity': 0}
+
+25 - standardscalerwrapper
+{'class_name': 'StandardScaler',
+ 'copy': True,
+ 'module_name': 'sklearn.preprocessing._data',
+ 'with_mean': False,
+ 'with_std': False}
+
+25 - xgboostclassifier
+{'base_score': 0.5,
+ 'booster': 'gbtree',
+ 'colsample_bylevel': 1,
+ 'colsample_bynode': 1,
+ 'colsample_bytree': 0.9,
+ 'eta': 0.3,
+ 'gamma': 0,
+ 'learning_rate': 0.1,
+ 'max_delta_step': 0,
+ 'max_depth': 0,
+ 'max_leaves': 1023,
+ 'min_child_weight': 1,
+ 'missing': nan,
+ 'n_estimators': 600,
+ 'n_jobs': 1,
+ 'nthread': None,
+ 'objective': 'multi:softprob',
+ 'random_state': 0,
+ 'reg_alpha': 1.4583333333333335,
+ 'reg_lambda': 2.291666666666667,
+ 'scale_pos_weight': 1,
+ 'seed': None,
+ 'silent': None,
+ 'subsample': 0.9,
+ 'tree_method': 'auto',
+ 'verbose': -10,
+ 'verbosity': 0}
+
+26 - sparsenormalizer
+{'copy': True, 'norm': 'l1'}
+
+26 - xgboostclassifier
+{'base_score': 0.5,
+ 'booster': 'gbtree',
+ 'colsample_bylevel': 1,
+ 'colsample_bynode': 1,
+ 'colsample_bytree': 1,
+ 'eta': 0.3,
+ 'gamma': 0.1,
+ 'learning_rate': 0.1,
+ 'max_delta_step': 0,
+ 'max_depth': 6,
+ 'max_leaves': 63,
+ 'min_child_weight': 1,
+ 'missing': nan,
+ 'n_estimators': 100,
+ 'n_jobs': 1,
+ 'nthread': None,
+ 'objective': 'multi:softprob',
+ 'random_state': 0,
+ 'reg_alpha': 0.625,
+ 'reg_lambda': 1.7708333333333335,
+ 'scale_pos_weight': 1,
+ 'seed': None,
+ 'silent': None,
+ 'subsample': 0.7,
+ 'tree_method': 'auto',
+ 'verbose': -10,
+ 'verbosity': 0}
+
+4 - maxabsscaler
+{'copy': True}
+
+4 - randomforestclassifier
+{'bootstrap': True,
+ 'ccp_alpha': 0.0,
+ 'class_weight': 'balanced',
+ 'criterion': 'gini',
+ 'max_depth': None,
+ 'max_features': 'log2',
+ 'max_leaf_nodes': None,
+ 'max_samples': None,
+ 'min_impurity_decrease': 0.0,
+ 'min_impurity_split': None,
+ 'min_samples_leaf': 0.01,
+ 'min_samples_split': 0.01,
+ 'min_weight_fraction_leaf': 0.0,
+ 'n_estimators': 25,
+ 'n_jobs': 1,
+ 'oob_score': True,
+ 'random_state': None,
+ 'verbose': 0,
+ 'warm_start': False}
+```
+
 
 <figure>
     <img src='img/BestAutoMLRunDetails.png' alt='bestrundetails' style="width:100%"/>
@@ -276,6 +611,11 @@ the only important feature but high internal correlations between RAM and other
 properties let us know that, only with this feature, we could obtain a good model. 
 
 *TODO* Remeber to provide screenshots of the `RunDetails` widget as well as a screenshot of the best model trained with it's parameters.
+<figure>
+    <img src='img/BestAutoMLRunDetails_SDK.png' alt='BestAutoMLRunDetails_SDK' style="width:100%"/>
+    <figcaption style="text-align:center">Figure 13: This is the result when RunDetails widget is run.</figcaption>
+</figure>
+
 
 HOW COULD BE THIS MODEL IMPROVED?
 
@@ -467,6 +807,41 @@ URI shown in the Figure 22 (or the new one obtained if a new endpoint is created
 with the data structure shown in data.json file. Then, you are going to receive 
 a response like the one shown.
 
+```
+import requests
+import json
+scoring_uri = 'http://7ad2a469-bb4e-4dbd-bc92-76496d925381.southcentralus.azurecontainer.io/score'
+
+# Define the data to post
+data = {"data": [
+                    {"battery_power": 1043, 
+                      "blue": 1, 
+                      "clock_speed": 1.8, 
+                      "dual_sim": 1, 
+                      "fc": 14, 
+                      "four_g": 0, 
+                      "int_memory": 5, 
+                      "m_dep": 0.1, 
+                      "mobile_wt": 193, 
+                      "n_cores": 3, 
+                      "pc": 16, 
+                      "px_height": 226, 
+                      "px_width": 1412, 
+                      "ram": 3476, 
+                      "sc_h": 12, 
+                      "sc_w": 7, 
+                      "talk_time": 2, 
+                      "three_g": 0, 
+                      "touch_screen": 1, 
+                      "wifi": 0}
+                      ]}
+# Define the header
+headers = {'Content-type': 'application/json'}
+
+# And obtain the response
+resp = requests.post(scoring_uri, input_data, headers=headers)
+```
+With the code above, just editing data, you can easily query the service.
 
 ## Screen Recording
 
@@ -480,6 +855,6 @@ explanations about the content of the project.
 ## Future Improvements
 For future improvements, we propose:
 
-* Convert the model to ONNX format.
+* Convert the model to ONNX format. This allows to interchange models between various ML frameworks and tools.
 * Deploy the model to the Edge using Azure IoT Edge.
-* Enable logging with App Insights, do benchmarking and develop swagger documentation as we did for ML-Ops project.
+* Enable logging with App Insights, do benchmarking and develop swagger documentation as we did for ML-Ops project. This steps would make this project more professional and mainteinable.
